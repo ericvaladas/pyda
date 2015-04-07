@@ -219,8 +219,11 @@ class Client(object):
 
         if code == 0:
             print("Login success!")
+        elif code == 3 or code == 14 or code == 15:
+            print(message)
         else:
             print(message)
+            self.login()
 
     def packet_handler_0x03_redirect(self, packet):
         address = packet.read(4)
