@@ -4,7 +4,7 @@ import random
 from numpy import uint8, uint16, int32
 
 
-class Packet:
+class Packet(object):
     @property
     def should_encrypt(self):
         return self.encrypt_method != EncryptMethod.NoEncrypt

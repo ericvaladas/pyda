@@ -1,4 +1,4 @@
-class ServerInfo:
+class ServerInfo(object):
     def __init__(self, address, port, name, friendly_name):
         self.address = address
         self.port = port

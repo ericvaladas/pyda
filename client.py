@@ -10,7 +10,7 @@ from time import time, sleep
 from numpy import uint8, uint16, uint32, int32
 
 
-class Client:
+class Client(object):
     da_version = 739
     start_time = 0
     client_ordinal = 0
