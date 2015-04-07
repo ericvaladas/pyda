@@ -201,7 +201,7 @@ class Crypto:
     def generate_key(self, a, b):
         key = ""
         for i in range(0, 9):
-            salt_index =  (i * (9 * i + int(b) * int(b)) + a) % len(self.key_salt)
+            salt_index = (i * (9 * i + int(b) * int(b)) + a) % len(self.key_salt)
             key += self.key_salt[salt_index]
 
         return key
@@ -371,4 +371,3 @@ class CRC32:
         for i in buffer:
             crc = (crc >> 8) ^ cls.crc_32_table[(crc & 0xFF) ^ i]
         return crc
-

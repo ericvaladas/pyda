@@ -5,7 +5,6 @@ from numpy import uint8, uint16, int32
 
 
 class Packet:
-
     @property
     def should_encrypt(self):
         return self.encrypt_method != EncryptMethod.NoEncrypt
@@ -33,8 +32,6 @@ class Packet:
             array[index] = '{:02X}'.format(element)
 
         return "-".join(array)
-
-    # TODO: explicit operator byte[]
 
     def seek(self, offset, origin):
         if origin == Packet.PacketSeekOrigin.Begin:
@@ -110,7 +107,6 @@ class ClientPacket(Packet):
     def write(self, buffer):
         self.data += buffer
 
-
     def write_byte(self, value):
         self.data.append(value)
 
@@ -120,13 +116,13 @@ class ClientPacket(Packet):
     def write_boolean(self, value):
         self.data.append(0x01 if value else 0x00)
 
-    def  write_int16(self, value):
+    def write_int16(self, value):
         packed = struct.pack('h', value)
         unpacked = struct.unpack('BB', packed)
         self.data.append(unpacked[1])
         self.data.append(unpacked[0])
 
-    def  write_uint16(self, value):
+    def write_uint16(self, value):
         packed = struct.pack('H', value)
         unpacked = struct.unpack('BB', packed)
         self.data.append(unpacked[1])
@@ -166,9 +162,7 @@ class ClientPacket(Packet):
         self.data.append(unpacked[1])
         self.data.append(unpacked[0])
         self.data += buffer
-        self.position ++ len(buffer) + 2
-
-    # TODO: WriteArray
+        self.position += len(buffer) + 2
 
     def encrypt(self, crypto):
         if self.opcode == 0x39 or self.opcode == 0x3A:
@@ -231,6 +225,15 @@ class ClientPacket(Packet):
 
 
 class ServerPacket(Packet):
+    def __init__(self, buffer):
+        self.opcode = buffer[3]
+        self.position = 0
+
+        if self.should_encrypt:
+            self.ordinal = buffer[4]
+            self.data = buffer[5:]
+        else:
+            self.data = buffer[4:]
 
     @property
     def encrypt_method(self):
@@ -243,16 +246,6 @@ class ServerPacket(Packet):
             return EncryptMethod.Normal
         else:
             return EncryptMethod.MD5Key
-
-    def __init__(self, buffer):
-        self.opcode = buffer[3]
-        self.position = 0
-
-        if self.should_encrypt:
-            self.ordinal = buffer[4]
-            self.data = buffer[5:]
-        else:
-            self.data = buffer[4:]
 
     def read(self, length):
         if self.position + length > len(self.data):
@@ -355,7 +348,7 @@ class ServerPacket(Packet):
 
     def decrypt(self, crypto):
         key = ""
-        length = len(self.data) -  3
+        length = len(self.data) - 3
 
         rand_16 = uint16((self.data[length + 2] << 8 | self.data[length]) ^ 0x6474)
         rand_8 = uint8(self.data[length + 1] ^ 0x24)
@@ -388,4 +381,3 @@ class PacketSeekOrigin:
     Begin = 0
     Current = 1
     End = 2
-
