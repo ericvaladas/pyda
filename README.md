@@ -27,3 +27,8 @@ class Client(_Client):
 
 Client.run('username', 'password')
 ```
+
+### Todo
+- Implement [a better IO Loop](http://tornado.readthedocs.org/en/latest/ioloop.html)
+- Generate a working client ID for login
+- Add more packet handlers
