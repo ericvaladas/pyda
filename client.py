@@ -50,12 +50,13 @@ class Client:
 
         while True:
             try:
-                sleep(0.10)
                 if client.recv_buffer:
                     client.handle_recv(client.recv_buffer.pop(0))
+                sleep(0.10)
             except KeyboardInterrupt:
-                client.disconnect()
                 break
+
+        client.disconnect()
 
     @property
     def tick_count(self):
@@ -81,10 +82,12 @@ class Client:
         socket_thread.start()
 
     def disconnect(self):
-        print("Disconnecting from {0}.".format(self.server.name))
-        self.socket.close()
-        self.server = None
-        self.socket = None
+        if self.server:
+            print("Disconnected from {0}.".format(self.server.name))
+            self.server = None
+        if self.socket:
+            self.socket.close()
+            self.socket = None
 
     def reconnect(self):
         self.disconnect()
@@ -305,6 +308,10 @@ class Client:
     def handle_recv(self, recv_buffer):
         recv_buffer = struct.unpack('B' * len(recv_buffer), recv_buffer)
 
+        if not recv_buffer:
+            self.disconnect()
+            return
+
         while len(recv_buffer) > 3:
             if recv_buffer[0] != 0xAA:
                 return
@@ -331,13 +338,15 @@ class Client:
 
 def ioloop(client):
     s = client.socket
-    recv_buffer = s.recv(4096)
-    while recv_buffer:
-        client.recv_buffer.append(recv_buffer)
+    while True:
         try:
             recv_buffer = s.recv(4096)
+            client.recv_buffer.append(recv_buffer)
         except socket.timeout:
             break
         except socket.error:
+            break
+
+        if not recv_buffer:
             break
     s.close()
