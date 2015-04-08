@@ -98,7 +98,7 @@ class Client(object):
     def send(self, packet):
         if packet.should_encrypt:
             packet.ordinal = self.client_ordinal
-            self.client_ordinal += 1
+            self.client_ordinal = uint8(self.client_ordinal + 1)
             packet.encrypt(self.crypto)
 
         # Wait for new socket to connect
