@@ -5,7 +5,7 @@ from server import ServerInfo, LoginServer
 import random
 import socket
 import struct
-import threading
+from threading import Thread
 from time import time, sleep
 from numpy import uint8, uint16, uint32, int32
 
@@ -68,17 +68,24 @@ class Client(object):
             port = LoginServer.port
 
         server = ServerInfo.from_ip_address(address, port)
-
-        print("Connecting to {0}...".format(server.name))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         if server == LoginServer:
             self.socket.settimeout(5)
-        self.socket.connect((address, port))
 
-        print("Connected.")
+        while True:
+            try:
+                print("Connecting to {0}...".format(server.name))
+                self.socket.connect((address, port))
+            except socket.error:
+                print("Failed. Trying again.")
+                continue
+
+            print("Connected.")
+            break
+
         self.server = server
-
-        socket_thread = threading.Thread(target=ioloop, args=(self,))
+        socket_thread = Thread(target=ioloop, args=(self,))
         socket_thread.start()
 
     def disconnect(self):
