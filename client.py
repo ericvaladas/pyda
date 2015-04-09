@@ -79,6 +79,7 @@ class Client(object):
                 self.socket.connect((address, port))
             except socket.error:
                 print("Failed. Trying again.")
+                sleep(1)
                 continue
 
             print("Connected.")
@@ -230,6 +231,7 @@ class Client(object):
             print(message)
         else:
             print(message)
+            sleep(1)
             self.login()
 
     def packet_handler_0x03_redirect(self, packet):
