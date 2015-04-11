@@ -1,5 +1,5 @@
 """
-Wrapper functions for ctypes data types to make casting more concise.
+Wrapper functions for ctypes to make casting more concise.
 """
 from ctypes import c_ubyte, c_ushort, c_uint, c_int
 
