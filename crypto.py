@@ -1,7 +1,7 @@
+from datatypes import uint8, uint16
+
 import hashlib
 import struct
-
-from numpy import uint8, uint16
 
 
 class Crypto(object):

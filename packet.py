@@ -1,7 +1,7 @@
+from datatypes import uint8, uint16, int32
+
 import struct
 import random
-
-from numpy import uint8, uint16, int32
 
 
 class Packet(object):

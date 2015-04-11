@@ -1,4 +1,5 @@
 from crypto import Crypto, NexonCRC16
+from datatypes import uint8, uint16, uint32, int32
 from packet import ServerPacket, ClientPacket
 from server import ServerInfo, LoginServer
 
@@ -7,7 +8,6 @@ import socket
 import struct
 from threading import Thread
 from time import time, sleep
-from numpy import uint8, uint16, uint32, int32
 
 
 class Client(object):
