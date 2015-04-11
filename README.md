@@ -8,11 +8,6 @@ Clone this repository.
 ```sh
 git clone https://github.com/ericvaladas/pyda.git
 ```
-  
-Install dependencies.
-```sh
-pip install -r requirements.txt
-```
 
 ### Usage
 Extend the base Client class and override the packet handlers.
