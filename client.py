@@ -1,13 +1,13 @@
 from crypto import Crypto, NexonCRC16
 from datatypes import uint8, uint16, uint32, int32
-from packet import ServerPacket, ClientPacket
-from server import ServerInfo, LoginServer
+from packet import ClientPacket, ServerPacket
+from server import LoginServer, ServerInfo
 
 import random
 import socket
 import struct
 from threading import Thread
-from time import time, sleep
+from time import sleep, time
 
 
 class Client(object):
