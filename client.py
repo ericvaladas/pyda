@@ -113,7 +113,10 @@ class Client(object):
         while not self.socket:
             sleep(0.10)
 
-        self.socket.send(packet.to_bytearray())
+        try:
+            self.socket.send(packet.to_bytearray())
+        except socket.error:
+            pass
 
         if self.show_outgoing:
             print("Sent: {0}".format(packet.to_string()))
