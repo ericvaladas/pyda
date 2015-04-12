@@ -128,41 +128,37 @@ class Client(object):
         print("Logged into {0} as {1}.".format(self.server.name, self.username))
         self.send(ClientPacket(0x2D))
 
-    def _login(self):
-        # TODO: Figure out why this client_id isn't working
-
+    def login(self):
         print("Logging in as {0}... ".format(self.username))
-        x03 = ClientPacket(0x03)
-        x03.write_string8(self.username)
-        x03.write_string8(self.password)
 
         key_1 = random.randint(0, 0xFF)
         key_2 = random.randint(0, 0xFF)
+        client_id = random.randint(0, 0xFFFFFFFF)
+        client_id_key = uint8(key_2 + 138)
 
-        client_id_1 = random.randint(0, 0xFFFFFFFF)
-        client_id = client_id_1
-        client_id_1_key = uint8(key_2 + 138)
-        client_id_1 ^= uint32(client_id_1_key | ((client_id_1_key + 1) << 8) | ((client_id_1_key + 2) << 16) | ((client_id_1_key + 3) << 24))
+        client_id_array = [
+            client_id & 0x0FF,
+            (client_id >> 8) & 0x0FF,
+            (client_id >> 16) & 0x0FF,
+            (client_id >> 24) & 0x0FF]
 
-        crc = NexonCRC16.crc_16_table
-        client_id_array = [0,0,0,0]
-        client_id_array[0] = client_id&0x0FF;
-        client_id_array[1] = (client_id>>8)&0x0FF;
-        client_id_array[2] = (client_id>>16)&0x0FF;
-        client_id_array[3] = (client_id>>24)&0x0FF;
-        hash = NexonCRC16.calculate(client_id_array,0,4)
-        
+        hash = NexonCRC16.calculate(client_id_array, 0, 4)
         client_id_checksum = uint16(hash)
-        client_id_checksum_key = uint8(key_2 + 0x5e)
-        client_id_checksum ^= uint16(client_id_checksum_key | ((client_id_checksum_key +1) <<8))
-        
+        client_id_checksum_key = uint8(key_2 + 0x5E)
+        client_id_checksum ^= uint16(client_id_checksum_key | ((client_id_checksum_key + 1) << 8))
+
+        client_id ^= uint32(client_id_key | ((client_id_key + 1) << 8) | ((client_id_key + 2) << 16) | ((client_id_key + 3) << 24))
+
         random_val = random.randint(0, 0xFFFF)
         random_val_key = uint8(key_2 + 115)
         random_val ^= uint32(random_val_key | ((random_val_key + 1) << 8) | ((random_val_key + 2) << 16) | ((random_val_key + 3) << 24))
 
+        x03 = ClientPacket(0x03)
+        x03.write_string8(self.username)
+        x03.write_string8(self.password)
         x03.write_byte(key_1)
         x03.write_byte(uint8(key_2 ^ (key_1 + 59)))
-        x03.write_uint32(client_id_1)
+        x03.write_uint32(client_id)
         x03.write_uint16(client_id_checksum)
         x03.write_uint32(random_val)
 
@@ -173,26 +169,6 @@ class Client(object):
         x03.write_uint16(crc)
         x03.write_uint16(0x0100)
 
-        self.send(x03)
-
-    def login(self):
-        """
-        Log in using a client_id taken from a real client.
-        This is a temporary workaround until I figure out
-        how to properly generate one.
-        """
-
-        print("Logging in as {0}... ".format(self.username))
-        x03 = ClientPacket(0x03)
-        x03.write_string8(self.username)
-        x03.write_string8(self.password)
-        x03.write_byte(0xE0)
-        x03.write_byte(0xC0)
-        x03.write_uint32(0x8A39DBB2)
-        x03.write_uint16(0x9E1D)
-        x03.write_uint32(0x263D94DF)
-        x03.write_uint16(0x6749)
-        x03.write_uint16(0x0100)
         self.send(x03)
 
     def packet_handler_0x00_encryption(self, packet):
