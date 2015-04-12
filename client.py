@@ -1,5 +1,5 @@
 from crypto import Crypto, NexonCRC16
-from datatypes import uint8, uint16, uint32, int32
+from datatypes import uint8, uint16, uint32
 from packet import ClientPacket, ServerPacket
 from server import LoginServer, ServerInfo
 
