@@ -32,21 +32,6 @@ class Packet(object):
 
         return "-".join(array)
 
-    def seek(self, offset, origin):
-        if origin == Packet.PacketSeekOrigin.Begin:
-            self.position = 0
-        elif origin == Packet.PacketSeekOrigin.End:
-            self.position = len(self.data)
-
-        self.position += offset
-        if self.position < 0:
-            self.position = 0
-
-        if self.position > len(self.data):
-            self.position = len(self.data)
-
-        return self.position
-
 
 class ClientPacket(Packet):
     dialog_crc_table = [
@@ -368,9 +353,3 @@ class EncryptMethod:
     NoEncrypt = 0
     Normal = 1
     MD5Key = 2
-
-
-class PacketSeekOrigin:
-    Begin = 0
-    Current = 1
-    End = 2
