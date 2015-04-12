@@ -140,17 +140,22 @@ class Client(object):
         key_2 = random.randint(0, 0xFF)
 
         client_id_1 = random.randint(0, 0xFFFFFFFF)
+        client_id = client_id_1
         client_id_1_key = uint8(key_2 + 138)
         client_id_1 ^= uint32(client_id_1_key | ((client_id_1_key + 1) << 8) | ((client_id_1_key + 2) << 16) | ((client_id_1_key + 3) << 24))
 
         crc = NexonCRC16.crc_16_table
-        packed = struct.pack('I', client_id_1)
-        unpacked = list(struct.unpack('BBBB', packed))
-
-        v1 = unpacked[1] ^ uint16(((uint8(client_id_1) ^ crc[0]) << 8) ^ crc[(int32(uint16((uint8(client_id_1) ^ crc[0]))) >> 8) & 0xFF])
-        v2 = uint8(client_id_1 >> 16) ^ uint16((v1 << 8) ^ crc[(int32(v1) >> 8) & 0xFF])
-        client_id_2 = uint16(unpacked[3] ^ (v2 << 8) ^ uint16(crc[(int32(v2) >> 8) & 0xFF]))
-
+        client_id_array = [0,0,0,0]
+        client_id_array[0] = client_id&0x0FF;
+        client_id_array[1] = (client_id>>8)&0x0FF;
+        client_id_array[2] = (client_id>>16)&0x0FF;
+        client_id_array[3] = (client_id>>24)&0x0FF;
+        hash = NexonCRC16.calculate(client_id_array,0,4)
+        
+        client_id_checksum = uint16(hash)
+        client_id_checksum_key = uint8(key_2 + 0x5e)
+        client_id_checksum ^= uint16(client_id_checksum_key | ((client_id_checksum_key +1) <<8))
+        
         random_val = random.randint(0, 0xFFFF)
         random_val_key = uint8(key_2 + 115)
         random_val ^= uint32(random_val_key | ((random_val_key + 1) << 8) | ((random_val_key + 2) << 16) | ((random_val_key + 3) << 24))
@@ -158,7 +163,7 @@ class Client(object):
         x03.write_byte(key_1)
         x03.write_byte(uint8(key_2 ^ (key_1 + 59)))
         x03.write_uint32(client_id_1)
-        x03.write_uint16(client_id_2)
+        x03.write_uint16(client_id_checksum)
         x03.write_uint32(random_val)
 
         crc = NexonCRC16.calculate(x03.data, len(self.username) + len(self.password) + 2, 12)
