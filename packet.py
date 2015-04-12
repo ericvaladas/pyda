@@ -1,7 +1,6 @@
-from datatypes import uint8, uint16, int32
+from datatypes import int8, uint8, int16, uint16, int32, uint32
 
 import random
-import struct
 
 
 class Packet(object):
@@ -108,41 +107,37 @@ class ClientPacket(Packet):
         self.data += buffer
 
     def write_byte(self, value):
-        self.data.append(value)
+        self.data.append(uint8(value))
 
     def write_sbyte(self, value):
-        self.data.append(value)
+        self.data.append(int8(value))
 
     def write_boolean(self, value):
         self.data.append(0x01 if value else 0x00)
 
     def write_int16(self, value):
-        packed = struct.pack('h', value)
-        unpacked = struct.unpack('BB', packed)
-        self.data.append(unpacked[1])
-        self.data.append(unpacked[0])
+        value = int16(value)
+        self.data.append((value >> 8) & 0xFF)
+        self.data.append(value & 0xFF)
 
     def write_uint16(self, value):
-        packed = struct.pack('H', value)
-        unpacked = struct.unpack('BB', packed)
-        self.data.append(unpacked[1])
-        self.data.append(unpacked[0])
+        value = uint16(value)
+        self.data.append((value >> 8) & 0xFF)
+        self.data.append(value & 0xFF)
 
     def write_int32(self, value):
-        packed = struct.pack('i', value)
-        unpacked = struct.unpack('BBBB', packed)
-        self.data.append(unpacked[3])
-        self.data.append(unpacked[2])
-        self.data.append(unpacked[1])
-        self.data.append(unpacked[0])
+        value = int32(value)
+        self.data.append((value >> 24) & 0xFF)
+        self.data.append((value >> 16) & 0xFF)
+        self.data.append((value >> 8) & 0xFF)
+        self.data.append(value & 0xFF)
 
     def write_uint32(self, value):
-        packed = struct.pack('I', value)
-        unpacked = struct.unpack('BBBB', packed)
-        self.data.append(unpacked[3])
-        self.data.append(unpacked[2])
-        self.data.append(unpacked[1])
-        self.data.append(unpacked[0])
+        value = uint32(value)
+        self.data.append((value >> 24) & 0xFF)
+        self.data.append((value >> 16) & 0xFF)
+        self.data.append((value >> 8) & 0xFF)
+        self.data.append(value & 0xFF)
 
     def write_string(self, value):
         buffer = bytearray(value.encode('949'))
@@ -157,10 +152,8 @@ class ClientPacket(Packet):
 
     def write_string16(self, value):
         buffer = bytearray(value.encode('949'))
-        packed = struct.pack('H', len(value))
-        unpacked = struct.unpack('BB', packed)
-        self.data.append(unpacked[1])
-        self.data.append(unpacked[0])
+        self.data.append((value >> 8) & 0xFF)
+        self.data.append(value & 0xFF)
         self.data += buffer
         self.position += len(buffer) + 2
 
