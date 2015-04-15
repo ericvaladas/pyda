@@ -70,8 +70,6 @@ class Client(object):
         server = ServerInfo.from_ip_address(address, port)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        if server == LoginServer:
-            self.socket.settimeout(5)
 
         while True:
             try:
@@ -85,6 +83,7 @@ class Client(object):
             print("Connected.")
             break
 
+        self.socket.setblocking(0)
         self.server = server
         socket_thread = Thread(target=ioloop, args=(self,))
         socket_thread.start()
@@ -108,10 +107,6 @@ class Client(object):
             packet.ordinal = self.client_ordinal
             self.client_ordinal = uint8(self.client_ordinal + 1)
             packet.encrypt(self.crypto)
-
-        # Wait for new socket to connect
-        while not self.socket:
-            sleep(0.10)
 
         try:
             self.socket.send(packet.to_bytearray())
@@ -338,11 +333,8 @@ def ioloop(client):
         try:
             recv_buffer = s.recv(4096)
             client.recv_buffer.append(recv_buffer)
-        except socket.timeout:
-            break
-        except socket.error:
-            break
-
-        if not recv_buffer:
-            break
+        except socket.error as socket_error:
+            if not socket_error.errno == 35:
+                break
+        sleep(0.10)
     s.close()
