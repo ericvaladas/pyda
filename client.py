@@ -327,7 +327,7 @@ def ioloop(client):
             recv_buffer = s.recv(4096)
             client.recv_buffer.append(recv_buffer)
         except socket.error as error:
-            if not error.errno == 11 or not error.errno == 35:
+            if not error.errno == 11 and not error.errno == 35:
                 break
         sleep(0.10)
     s.close()
