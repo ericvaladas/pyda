@@ -190,21 +190,19 @@ class Client(object):
         self.send(x57)
 
     def packet_handler_0x02_login_message(self, packet):
-        """
-        Code 0: Success
-        Code 3: Invalid name or password
-        Code 14: Name does not exist
-        Code 15: Incorrect password
-        """
         code = packet.read_byte()
         message = packet.read_string8()
+        print(message)
 
-        if code == 0:
-            print("Login success!")
-        elif code == 3 or code == 14 or code == 15:
-            print(message)
+        if code == 0 or code == 3 or code == 14 or code == 15:
+            # code 0: Success
+            # code 3: Invalid name or password
+            # code 14: Name does not exist
+            # code 15: Incorrect password
+            pass
         else:
-            print(message)
+            # TODO: I only want to check for codes that will
+            # cause this login retry.
             sleep(1)
             self.login()
 
