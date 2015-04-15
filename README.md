@@ -33,5 +33,5 @@ class Client(_Client):
 
 ### Todo
 - Implement [a better IO Loop](http://tornado.readthedocs.org/en/latest/ioloop.html)
-- Generate a working client ID for login
+- ~~Generate a working client ID for login~~
 - Add more packet handlers
