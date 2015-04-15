@@ -70,18 +70,13 @@ class Client(object):
         server = ServerInfo.from_ip_address(address, port)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+        print("Connecting to {0}...".format(server.name))
 
-        while True:
-            try:
-                print("Connecting to {0}...".format(server.name))
-                self.socket.connect((address, port))
-            except socket.error:
-                print("Failed. Trying again.")
-                sleep(1)
-                continue
+        while self.socket.connect_ex((address, port)):
+            print("Failed. Trying again...")
+            sleep(1)
 
-            print("Connected.")
-            break
+        print("Connected.")
 
         self.socket.setblocking(0)
         self.server = server
