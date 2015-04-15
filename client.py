@@ -105,11 +105,11 @@ class Client(object):
 
         try:
             self.socket.send(packet.to_bytearray())
-        except socket.error:
-            pass
 
-        if self.show_outgoing:
-            print("Sent: {0}".format(packet.to_string()))
+            if self.show_outgoing:
+                print("Sent: {0}".format(packet.to_string()))
+        except socket.error as socket_error:
+            print(socket_error)
 
     def connected_to_login(self):
         self.login()
