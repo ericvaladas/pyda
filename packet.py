@@ -307,7 +307,7 @@ class ServerPacket(Packet):
         buffer = self.data[position:position + length]
         self.position += length + 1
 
-        return bytearray(buffer).decode('949')
+        return bytearray(buffer).decode('utf8')
 
     def read_string16(self):
         if self.position + 2 > len(self.data):
@@ -322,7 +322,7 @@ class ServerPacket(Packet):
         buffer = self.data[position:position + length]
         self.position += length + 2
 
-        return bytearray(buffer).decode('949')
+        return bytearray(buffer).decode('utf8')
 
     def decrypt(self, crypto):
         key = ""
