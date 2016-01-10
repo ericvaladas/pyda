@@ -12,18 +12,6 @@ from time import sleep, time
 
 class Client(object):
     da_version = 739
-    start_time = 0
-    client_ordinal = 0
-    socket = None
-    server = None
-    sent_version = False
-    crypto = None
-    username = None
-    password = None
-    show_outgoing = False
-    show_incoming = False
-    recv_buffer = []
-    packet_handlers = {}
 
     def __init__(self, username, password):
         self.username = username
@@ -31,17 +19,24 @@ class Client(object):
         self.crypto = Crypto()
         self.start_time = time()
         self.recv_buffer = []
+        self.client_ordinal = 0
+        self.socket = None
+        self.server = None
+        self.sent_version = False
+        self.show_outgoing = False
+        self.show_incoming = False
 
-        self.packet_handlers[0x00] = self.packet_handler_0x00_encryption
-        self.packet_handlers[0x02] = self.packet_handler_0x02_login_message
-        self.packet_handlers[0x03] = self.packet_handler_0x03_redirect
-        self.packet_handlers[0x05] = self.packet_handler_0x05_user_id
-        self.packet_handlers[0x0A] = self.packet_handler_0x0A_system_message
-        self.packet_handlers[0x0D] = self.packet_handler_0x0D_chat
-        self.packet_handlers[0x3B] = self.packet_handler_0x3B_ping_a
-        self.packet_handlers[0x4C] = self.packet_handler_0x4C_ending_signal
-        self.packet_handlers[0x68] = self.packet_handler_0x68_ping_b
-        self.packet_handlers[0x7E] = self.packet_handler_0x7E_welcome
+        self.packet_handlers = {
+            0x00: self.packet_handler_0x00_encryption,
+            0x02: self.packet_handler_0x02_login_message,
+            0x03: self.packet_handler_0x03_redirect,
+            0x05: self.packet_handler_0x05_user_id,
+            0x0A: self.packet_handler_0x0A_system_message,
+            0x0D: self.packet_handler_0x0D_chat,
+            0x3B: self.packet_handler_0x3B_ping_a,
+            0x4C: self.packet_handler_0x4C_ending_signal,
+            0x68: self.packet_handler_0x68_ping_b,
+            0x7E: self.packet_handler_0x7E_welcome}
 
     @classmethod
     def run(cls, username, password):
@@ -112,13 +107,13 @@ class Client(object):
             print(error)
 
     def connected_to_login(self):
-        self.login()
+        self.log_in()
 
     def connected_to_world(self):
         print("Logged into {0} as {1}.".format(self.server.name, self.username))
         self.send(ClientPacket(0x2D))
 
-    def login(self):
+    def log_in(self):
         print("Logging in as {0}... ".format(self.username))
 
         key_1 = random.randint(0, 0xFF)
@@ -204,7 +199,7 @@ class Client(object):
             # TODO: I only want to check for codes that will
             # cause this login retry.
             sleep(1)
-            self.login()
+            self.log_in()
 
     def packet_handler_0x03_redirect(self, packet):
         address = packet.read(4)
@@ -321,13 +316,13 @@ class Client(object):
 
 
 def ioloop(client):
-    s = client.socket
+    client_socket = client.socket
     while True:
         try:
-            recv_buffer = s.recv(4096)
+            recv_buffer = client_socket.recv(4096)
             client.recv_buffer.append(recv_buffer)
         except socket.error as error:
             if not error.errno == 11 and not error.errno == 35:
                 break
         sleep(0.10)
-    s.close()
+    client_socket.close()

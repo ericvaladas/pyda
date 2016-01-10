@@ -325,7 +325,7 @@ class ServerPacket(Packet):
         return bytearray(buffer).decode('utf8')
 
     def decrypt(self, crypto):
-        key = ""
+        key = ''
         length = len(self.data) - 3
 
         rand_16 = uint16((self.data[length + 2] << 8 | self.data[length]) ^ 0x6474)
