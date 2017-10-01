@@ -21,6 +21,6 @@ class ServerInfo(object):
         return '{0}:{1}'.format(self.address, self.port)
 
 
-LoginServer = ServerInfo('64.124.47.50', 2610, "Login Server", "Login Server")
-TemuairServer = ServerInfo('64.124.47.50', 2615, "Temuair Server", "Temuair")
-MedeniaServer = ServerInfo('64.124.47.50', 2617, "Medenia Server", "Medenia")
+LoginServer = ServerInfo('52.88.55.94', 2610, "Login Server", "Login Server")
+TemuairServer = ServerInfo('52.88.55.94', 2611, "Temuair Server", "Temuair")
+MedeniaServer = ServerInfo('52.88.55.94', 2612, "Medenia Server", "Medenia")
