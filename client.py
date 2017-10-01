@@ -11,7 +11,7 @@ from time import sleep, time
 
 
 class Client(object):
-    da_version = 739
+    da_version = 741
 
     def __init__(self, username, password):
         self.username = username
@@ -217,6 +217,7 @@ class Client(object):
 
         self.disconnect()
         self.connect(address, port)
+        self.client_ordinal = 0
 
         x10 = ClientPacket(0x10)
         x10.write_byte(seed)

@@ -1,7 +1,7 @@
 from datatypes import int8, uint8, int16, uint16, int32, uint32
 
 import random
-
+import hashlib
 
 class Packet(object):
     @property
@@ -170,6 +170,14 @@ class ClientPacket(Packet):
             if salt_index != self.ordinal:
                 self.data[i] ^= crypto.salt[self.ordinal]
 
+        bytes_to_hash = [self.opcode, self.ordinal]
+        bytes_to_hash += self.data
+        data_hash = hashlib.md5(bytearray(bytes_to_hash)).digest()
+
+        self.write_byte(ord(data_hash[13]))
+        self.write_byte(ord(data_hash[3]))
+        self.write_byte(ord(data_hash[11]))
+        self.write_byte(ord(data_hash[7]))
         self.write_byte(uint8(rand_16 % 256 ^ 0x70))
         self.write_byte(uint8(rand_8 ^ 0x23))
         self.write_byte(uint8((rand_16 >> 8) % 256 ^ 0x74))
